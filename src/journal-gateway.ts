@@ -14,13 +14,15 @@ function rangeEntries({ start = "", skip = 0, take = 50 } = {}) {
   return `entries=${start}${skip ? `:${skip}` : ""}:${take}`;
 }
 
-export async function getEntries() {
+export async function getEntries({
+  range,
+}: { range?: { start?: string; skip?: number; take?: number } } = {}) {
   const response = await fetch(entriesUrl, {
     method: "GET",
     headers: {
       Accept: "application/json",
       Authorization,
-      Range: rangeEntries(),
+      Range: rangeEntries(range),
     },
   });
 
