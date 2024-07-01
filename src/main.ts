@@ -3,6 +3,7 @@ import Fastify from "fastify";
 import { db } from "./db/db";
 import { journalEntries } from "./db/schema";
 import { getEntries } from "./journal-gateway";
+import { logger } from "./logger";
 
 async function syncEntries() {
   const existingEntries = await db
@@ -31,7 +32,7 @@ setInterval(() => {
   syncEntries();
 }, 1000);
 
-const fastify = Fastify({ logger: true });
+const fastify = Fastify({ logger });
 
 fastify.get("/", async (request, reply) => {
   return await db.select().from(journalEntries);

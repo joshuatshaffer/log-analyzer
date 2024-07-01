@@ -2,6 +2,12 @@
   "scripts": {
     "dev": "tsx watch --clear-screen=false --env-file=.env src/main.ts"
   },
+  "dependencies": {
+    "drizzle-orm": "0.31.2",
+    "pg": "8.12.0",
+    "pino": "9.2.0",
+    "pino-pretty": "11.2.1"
+  },
   "devDependencies": {
     "@types/node": "20.14.9",
     "@types/pg": "8.11.6",
@@ -10,9 +16,5 @@
     "prettier": "3.3.2",
     "tsx": "4.16.0",
     "typescript": "5.5.3"
-  },
-  "dependencies": {
-    "drizzle-orm": "0.31.2",
-    "pg": "8.12.0"
   }
 }

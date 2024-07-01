@@ -1,6 +1,6 @@
 {
   "editor.formatOnSave": true,
-  "cSpell.words": ["fastify"],
+  "cSpell.words": ["fastify", "pino"],
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit"
   }
