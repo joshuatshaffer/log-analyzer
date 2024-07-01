@@ -3,10 +3,16 @@
     "dev": "tsx watch --clear-screen=false --env-file=.env src/main.ts"
   },
   "devDependencies": {
-    "typescript": "5.5.3",
-    "tsx": "4.16.0",
     "@types/node": "20.14.9",
+    "@types/pg": "8.11.6",
+    "drizzle-kit": "0.22.8",
     "fastify": "4.28.1",
-    "prettier": "3.3.2"
+    "prettier": "3.3.2",
+    "tsx": "4.16.0",
+    "typescript": "5.5.3"
+  },
+  "dependencies": {
+    "drizzle-orm": "0.31.2",
+    "pg": "8.12.0"
   }
 }

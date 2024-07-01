@@ -1,11 +1,11 @@
 import Fastify from "fastify";
-import { getEntries } from "./journal-gateway";
+import { db } from "./db/db";
+import { journalEntries } from "./db/schema";
 
 const fastify = Fastify({ logger: true });
 
 fastify.get("/", async (request, reply) => {
-  const a = await getEntries();
-  return a;
+  return await db.select().from(journalEntries);
 });
 
 async function main() {
