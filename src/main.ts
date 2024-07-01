@@ -35,7 +35,7 @@ setInterval(() => {
 const fastify = Fastify({ logger });
 
 fastify.get("/", async (request, reply) => {
-  return await db.select().from(journalEntries);
+  return await db.select().from(journalEntries).limit(10);
 });
 
 async function main() {
