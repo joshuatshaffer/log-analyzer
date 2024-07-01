@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "tsx watch --clear-screen=false src/main.ts"
+    "dev": "tsx watch --clear-screen=false --env-file=.env src/main.ts"
   },
   "devDependencies": {
     "typescript": "5.5.3",
