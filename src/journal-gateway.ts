@@ -87,52 +87,76 @@ function transformLinesStream() {
   });
 }
 
-interface SseEvent {
-  event: string;
-  data: unknown;
+interface SseEvent<T> {
+  type: string;
+  data: T;
 }
 
-function parseSseStream() {
-  let event: string = "message";
-  let lines: string[] = [];
+/**
+ * @see https://html.spec.whatwg.org/multipage/server-sent-events.html#event-stream-interpretation
+ */
+function parseSseStream<T>({
+  parseData = JSON.parse,
+}: { parseData?: (data: string) => T } = {}) {
+  const newBuffer = () => ({
+    event: "",
+    data: "",
+  });
 
-  const flush = (controller: TransformStreamDefaultController<SseEvent>) => {
-    if (lines.length === 0) {
+  let buffer = newBuffer();
+
+  const dispatchEvent = (
+    controller: TransformStreamDefaultController<SseEvent<T>>
+  ) => {
+    if (buffer.data === "") {
+      buffer = newBuffer();
       return;
     }
-    const data = lines.join("\n");
-    lines = [];
-    controller.enqueue({ event, data: JSON.parse(data) });
+
+    if (buffer.data.endsWith("\n")) {
+      buffer.data = buffer.data.slice(0, -1);
+    }
+
+    controller.enqueue({
+      type: buffer.event || "message",
+      data: parseData(buffer.data),
+    });
+
+    buffer = newBuffer();
   };
 
-  return new TransformStream<string, SseEvent>({
+  return new TransformStream<string, SseEvent<T>>({
     transform(line, controller) {
+      // Blank lines separate events.
       if (line === "") {
-        flush(controller);
+        dispatchEvent(controller);
         return;
       }
 
+      // Ignore comments.
+      if (line.startsWith(":")) {
+        return;
+      }
+
+      // Field names must be followed by a colon, or the entire line is the
+      // field name. The only fields we care about are "event" and "data".
       {
-        const eMatch = line.match(/^event: (.*)/);
-        if (eMatch?.[1]) {
-          event = eMatch[1];
+        const match = line.match(/^(event|data)(?:: ?(.*))?$/);
+        if (match) {
+          const fieldName = match[1];
+          const value = match[2] ?? "";
+          if (fieldName === "event") {
+            buffer.event = value;
+          } else if (fieldName === "data") {
+            buffer.data += value + "\n";
+          }
           return;
         }
       }
-
-      {
-        const dMatch = line.match(/^data: (.*)/);
-        if (dMatch?.[1]) {
-          lines.push(dMatch[1]);
-          return;
-        }
-      }
-
-      console.warn("Unknown line", line);
     },
 
     flush(controller) {
-      flush(controller);
+      dispatchEvent(controller);
     },
   });
 }
