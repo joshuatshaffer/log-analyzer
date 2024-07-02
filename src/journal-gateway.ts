@@ -13,7 +13,7 @@ const password = process.env.JOURNAL_GATEWAY_PASSWORD ?? "example password";
 const Authorization =
   "Basic " + Buffer.from(username + ":" + password).toString("base64");
 
-function rangeEntries({ start = "", skip = 0, take = 200 } = {}) {
+function rangeEntries({ start = "", skip = 0, take = 50 } = {}) {
   return `entries=${start}${skip ? `:${skip}` : ""}:${take}`;
 }
 
@@ -55,9 +55,7 @@ export async function streamEntries({
     throw new Error("No body");
   }
 
-  for await (const text of body
+  return body
     .pipeThrough(new TextDecoderStream())
-    .pipeThrough(parseSseTransformStream())) {
-    console.log(text);
-  }
+    .pipeThrough(parseSseTransformStream());
 }

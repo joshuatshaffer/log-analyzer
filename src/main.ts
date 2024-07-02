@@ -2,7 +2,7 @@ import { desc } from "drizzle-orm";
 import Fastify from "fastify";
 import { db } from "./db/db";
 import { journalEntries } from "./db/schema";
-import { getEntries, streamEntries } from "./journal-gateway";
+import { streamEntries } from "./journal-gateway";
 import { logger } from "./logger";
 
 async function syncEntries() {
@@ -14,18 +14,21 @@ async function syncEntries() {
 
   const latestEntry = existingEntries[0];
 
-  const entries = await getEntries({
-    range: latestEntry
-      ? {
-          start: (latestEntry.fields as Record<string, string>)["__CURSOR"],
-          skip: 1,
-        }
-      : undefined,
+  const entries = await streamEntries({
+    range: {
+      take: 20_000,
+      ...(latestEntry
+        ? {
+            start: (latestEntry.fields as Record<string, string>)["__CURSOR"],
+            skip: 1,
+          }
+        : undefined),
+    },
   });
 
-  await db
-    .insert(journalEntries)
-    .values(entries.map((entry) => ({ fields: entry })));
+  for await (const entry of entries) {
+    await db.insert(journalEntries).values({ fields: entry });
+  }
 
   setTimeout(() => {
     syncEntries();
@@ -41,9 +44,7 @@ fastify.get("/", async (request, reply) => {
 });
 
 async function main() {
-  // await fastify.listen({ port: 3000 });
-
-  await streamEntries();
+  await fastify.listen({ port: 3000 });
 }
 
 main().catch((err) => {
