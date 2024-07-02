@@ -26,11 +26,13 @@ async function syncEntries() {
   await db
     .insert(journalEntries)
     .values(entries.map((entry) => ({ fields: entry })));
+
+  setTimeout(() => {
+    syncEntries();
+  }, 10);
 }
 
-setInterval(() => {
-  syncEntries();
-}, 1000);
+syncEntries();
 
 const fastify = Fastify({ logger });
 

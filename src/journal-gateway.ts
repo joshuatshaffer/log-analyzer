@@ -10,7 +10,7 @@ const password = process.env.JOURNAL_GATEWAY_PASSWORD ?? "example password";
 const Authorization =
   "Basic " + Buffer.from(username + ":" + password).toString("base64");
 
-function rangeEntries({ start = "", skip = 0, take = 50 } = {}) {
+function rangeEntries({ start = "", skip = 0, take = 200 } = {}) {
   return `entries=${start}${skip ? `:${skip}` : ""}:${take}`;
 }
 

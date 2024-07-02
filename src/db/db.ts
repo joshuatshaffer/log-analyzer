@@ -13,7 +13,7 @@ const pool = new Pool({
 export const db = drizzle(pool, {
   logger: {
     logQuery: (query, params) => {
-      logger.info({ query, params });
+      logger.trace({ query, params });
     },
   },
 });
