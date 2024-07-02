@@ -26,6 +26,8 @@ async function syncEntries() {
     },
   });
 
+  let insertBatch: { cursor: string; fields: unknown }[] = [];
+
   for await (const entry of entries) {
     const cursor = (entry.data as Record<string, string>).__CURSOR;
     if (typeof cursor !== "string") {
@@ -33,7 +35,17 @@ async function syncEntries() {
       continue;
     }
 
-    await db.insert(journalEntries).values({ cursor, fields: entry.data });
+    insertBatch.push({ cursor, fields: entry.data });
+
+    if (insertBatch.length >= 100) {
+      await db.insert(journalEntries).values(insertBatch);
+      insertBatch = [];
+    }
+  }
+
+  if (insertBatch.length > 0) {
+    await db.insert(journalEntries).values(insertBatch);
+    insertBatch = [];
   }
 
   setTimeout(() => {
