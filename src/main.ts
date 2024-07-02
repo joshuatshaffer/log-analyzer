@@ -19,7 +19,7 @@ async function syncEntries() {
       take: 20_000,
       ...(latestEntry
         ? {
-            start: (latestEntry.fields as Record<string, string>)["__CURSOR"],
+            start: latestEntry.cursor,
             skip: 1,
           }
         : undefined),
@@ -27,7 +27,13 @@ async function syncEntries() {
   });
 
   for await (const entry of entries) {
-    await db.insert(journalEntries).values({ fields: entry });
+    const cursor = (entry.data as Record<string, string>).__CURSOR;
+    if (typeof cursor !== "string") {
+      logger.error({ journalEntry: entry.data }, "Invalid cursor");
+      continue;
+    }
+
+    await db.insert(journalEntries).values({ cursor, fields: entry.data });
   }
 
   setTimeout(() => {
