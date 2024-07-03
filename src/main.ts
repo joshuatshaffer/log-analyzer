@@ -1,12 +1,15 @@
 import Fastify from "fastify";
-import { db } from "./db/db";
-import { journalEntries } from "./db/schema";
+import { ListJournalEntries } from "./ListJournalEntries";
+import { renderElementToString } from "./jsx/jsx-render";
 import { logger } from "./logger";
 
 const fastify = Fastify({ logger });
 
 fastify.get("/", async (request, reply) => {
-  return await db.select().from(journalEntries).limit(10);
+  reply.header("Content-Type", "text/html");
+  return (
+    "<!DOCTYPE html>\n" + (await renderElementToString(ListJournalEntries()))
+  );
 });
 
 async function main() {

@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "dev": "tsx watch --clear-screen=false --env-file=.env src/main.ts"
+    "dev": "tsx watch --clear-screen=false --env-file=.env src/main.ts",
+    "build": "tsc"
   },
   "dependencies": {
     "drizzle-orm": "0.31.2",
