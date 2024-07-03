@@ -1,15 +1,27 @@
-import Fastify from "fastify";
+import Fastify, { FastifyReply } from "fastify";
 import { ListJournalEntries } from "./ListJournalEntries";
-import { renderElementToString } from "./jsx/jsx-render";
+import { iterableToReadableStream } from "./iterableToReadableStream";
+import { renderElement } from "./jsx/jsx-render";
+import { Element, ElementType } from "./jsx/jsx-types";
 import { logger } from "./logger";
 
 const fastify = Fastify({ logger });
 
-fastify.get("/", async (request, reply) => {
+function sendElement(
+  reply: FastifyReply,
+  element: Element<unknown, ElementType>
+) {
   reply.header("Content-Type", "text/html");
-  return (
-    "<!DOCTYPE html>\n" + (await renderElementToString(ListJournalEntries()))
+  return iterableToReadableStream(
+    (async function* () {
+      yield "<!DOCTYPE html>\n";
+      yield* renderElement(element);
+    })()
   );
+}
+
+fastify.get("/", async (request, reply) => {
+  sendElement(reply, ListJournalEntries());
 });
 
 async function main() {
