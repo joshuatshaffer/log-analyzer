@@ -10,8 +10,11 @@ export interface Element<P, T extends ElementType> {
   key?: Key;
 }
 
-export type Node = _Node | PromiseLike<_Node>;
-type _Node = string | number | Element<any, any> | null | undefined | Node[];
+type NodePrimitive = string | number | null | undefined | Element<any, any>;
+
+type NodeNonPromise = NodePrimitive | Iterable<Node> | AsyncIterable<Node>;
+
+export type Node = NodeNonPromise | PromiseLike<NodeNonPromise>;
 
 export interface IntrinsicElements {
   [key: string]: {

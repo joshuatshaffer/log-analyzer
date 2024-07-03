@@ -5,17 +5,15 @@ export function ListJournalEntries() {
   return (
     <body>
       <ul>
-        {db
-          .select()
-          .from(journalEntries)
-          .limit(10)
-          .then((entries) =>
-            entries.map((entry) => (
+        {(async function* () {
+          for (const entry of await db.select().from(journalEntries).limit(2)) {
+            yield (
               <li>
                 {entry.id} <pre>{JSON.stringify(entry.fields, null, 2)}</pre>
               </li>
-            ))
-          )}
+            );
+          }
+        })()}
       </ul>
     </body>
   );

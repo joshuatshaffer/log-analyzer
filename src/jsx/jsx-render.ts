@@ -48,26 +48,44 @@ async function* renderNode(node: Node): AsyncIterable<string> {
     return;
   }
 
-  if (Array.isArray(node)) {
+  if (typeof node === "number" || typeof node === "string") {
+    yield "" + node;
+    return;
+  }
+
+  if (isIterable(node)) {
     for (const n of node) {
       yield* renderNode(n);
     }
     return;
   }
 
-  if (typeof node === "object") {
-    if (isPromiseLike(node)) {
-      yield* renderNode(await node);
-      return;
+  if (isAsyncIterable(node)) {
+    for await (const n of node) {
+      yield* renderNode(n);
     }
-
-    yield* renderElement(node);
     return;
   }
 
-  yield "" + node;
+  if (isPromiseLike(node)) {
+    yield* renderNode(await node);
+    return;
+  }
+
+  yield* renderElement(node);
 }
 
-function isPromiseLike<T>(value: unknown): value is PromiseLike<T> {
-  return typeof (value as PromiseLike<T>)?.then === "function";
+function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
+  return typeof (value as PromiseLike<unknown>)?.then === "function";
+}
+
+function isIterable(value: unknown): value is Iterable<unknown> {
+  return typeof (value as Iterable<unknown>)?.[Symbol.iterator] === "function";
+}
+
+function isAsyncIterable(value: unknown): value is AsyncIterable<unknown> {
+  return (
+    typeof (value as AsyncIterable<unknown>)?.[Symbol.asyncIterator] ===
+    "function"
+  );
 }
