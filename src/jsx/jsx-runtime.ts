@@ -4,20 +4,10 @@ import {
   Key,
   Element as _Element,
   IntrinsicElements as _IntrinsicElements,
-  isElementSym,
 } from "./jsx-types";
 
-export function jsx<P, T extends ElementType>(
-  type: T,
-  props: P,
-  key?: Key
-): _Element<P, T> {
-  return {
-    [isElementSym]: true,
-    type,
-    props,
-    key,
-  };
+export function jsx<P, T extends ElementType>(type: T, props: P, key?: Key) {
+  return new _Element(type, props, key);
 }
 
 export const jsxs = jsx;

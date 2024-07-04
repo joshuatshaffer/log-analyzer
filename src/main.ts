@@ -2,13 +2,13 @@ import Fastify from "fastify";
 import { ListJournalEntries } from "./ListJournalEntries";
 import { iterableToReadableStream } from "./iterableToReadableStream";
 import { renderElement } from "./jsx/jsx-render";
-import { isElement } from "./jsx/jsx-types";
+import { Element } from "./jsx/jsx-types";
 import { logger } from "./logger";
 
 const fastify = Fastify({ logger });
 
 fastify.addHook("preSerialization", (_request, reply, payload, done) => {
-  if (isElement(payload)) {
+  if (payload instanceof Element) {
     reply.header("Content-Type", "text/html");
     reply.send(
       iterableToReadableStream(
