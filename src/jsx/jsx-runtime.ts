@@ -6,7 +6,7 @@ import {
   IntrinsicElements as _IntrinsicElements,
 } from "./jsx-types";
 
-export function jsx<P, T extends ElementType>(type: T, props: P, key?: Key) {
+export function jsx<T extends ElementType, P>(type: T, props: P, key?: Key) {
   return new _Element(type, props, key);
 }
 

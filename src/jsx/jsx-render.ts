@@ -1,7 +1,7 @@
 import { Element, ElementType, IntrinsicElements, Node } from "./jsx-types";
 
-export async function renderElementToString<P, T extends ElementType>(
-  element: Element<P, T>
+export async function renderElementToString<T extends ElementType, P>(
+  element: Element<T, P>
 ): Promise<string> {
   let result = "";
   for await (const chunk of renderElement(element)) {
@@ -10,8 +10,8 @@ export async function renderElementToString<P, T extends ElementType>(
   return result;
 }
 
-export async function* renderElement<P, T extends ElementType>(
-  element: Element<P, T>
+export async function* renderElement<T extends ElementType, P>(
+  element: Element<T, P>
 ): AsyncIterable<string> {
   if (typeof element.type === "string") {
     const { key, children, ...props } =

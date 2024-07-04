@@ -4,7 +4,7 @@ export type FunctionComponent<P> = (props: P) => Node;
 
 export type ElementType = keyof IntrinsicElements | FunctionComponent<any>;
 
-export class Element<P, T extends ElementType> {
+export class Element<T extends ElementType, P> {
   constructor(
     public readonly type: T,
     public readonly props: P,
