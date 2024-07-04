@@ -1,19 +1,22 @@
+import { asc } from "drizzle-orm";
 import { db } from "./db/db";
 import { journalEntries } from "./db/schema";
 
-export function ListJournalEntries() {
+export async function ListJournalEntries() {
+  const entries = await db
+    .select()
+    .from(journalEntries)
+    .limit(100)
+    .orderBy(asc(journalEntries.id));
+
   return (
     <body>
       <ul>
-        {(async function* () {
-          for (const entry of await db.select().from(journalEntries).limit(2)) {
-            yield (
-              <li>
-                {entry.id} <pre>{JSON.stringify(entry.fields, null, 2)}</pre>
-              </li>
-            );
-          }
-        })()}
+        {entries.map((entry) => (
+          <li>
+            {entry.id} <pre>{JSON.stringify(entry.fields, null, 2)}</pre>
+          </li>
+        ))}
       </ul>
     </body>
   );
